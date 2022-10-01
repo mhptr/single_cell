@@ -5,7 +5,7 @@
 # if (!require("BiocManager", quietly = TRUE))
 #   install.packages("BiocManager")
 # 
-# BiocManager::install("glmGamPoi")
+# BiocManager::install("glmGamPoi") 
 ######### ---------------------------------------------------
 ##
 # if (!requireNamespace("remotes", quietly = TRUE)) {
@@ -61,64 +61,9 @@ library(celldex)
 #library(scater)
 ###################################### 
 
-# Seurat - Combining Two 10X Runs
-#REF: https://satijalab.org/seurat/articles/merge_vignette.html
-
-## reading in the 10X cell ranger .H5 output
-HW1 = Read10X_h5(filename = "output_filtered_hw1.h5", 
-                 use.names = TRUE, 
-                 unique.features = TRUE)
-
-HW2 = Read10X_h5(filename = "output_filtered_hw2.h5", 
-                 use.names = TRUE, 
-                 unique.features = TRUE)
-
-HW3 = Read10X_h5(filename = "output_filtered_hw3.h5", 
-                 use.names = TRUE, 
-                 unique.features = TRUE)
-
-str(HW1)
-head(HW1, n=3)
-str(HW2)
-head(HW2, n=3)
-str(HW3)
-head(HW3, n=3)
-
-
-seurat_HW1 = CreateSeuratObject(counts = HW1)
-str(seurat_HW1)
-seurat_HW1
-
-
-seurat_HW2 = CreateSeuratObject(counts = HW2)
-str(seurat_HW2)
-seurat_HW2
-
-
-seurat_HW3 = CreateSeuratObject(counts = HW3)
-str(seurat_HW3)
-seurat_HW3
-
-
-
-
-# Merging More Than Two Seurat Objects
-
-HW_all = 
-  merge(
-    HW1, 
-    y = c(HW2, HW3), 
-    add.cell.ids = c("HW1", "HW2", "HW3"), 
-    project = "E-MTAB-9199"
-  )
-
-HW_all
-
 
 
 ############## SEURAT
-
-
 ## setting work dir
 
 work_dir = file.path("scRNA_data")
@@ -128,10 +73,6 @@ plot_dir = file.path(work_dir, "output")
 plot_dir
 
 setwd(file_dir)
-
-## read 
-# idf = read_delim("../E-MTAB-9199.idf.txt")
-# sdrf = read.delim("../E-MTAB-9199.sdrf.txt")
 
 ## download date from
 ## https://data.humancellatlas.org/explore/projects/a62dae2e-cd69-4d5c-b5f8-4f7e8abdbafa
@@ -158,48 +99,14 @@ seurat_h5
 # Active assay: RNA (33694 features, 0 variable features)
 
 
-
-
-
-# An object of class Seurat 
-# 38436 features across 13120 samples within 1 assay 
-# Active assay: RNA (38436 features, 0 variable features)
-
-# # A Seurat-tibble abstraction: 13,120 × 5
-# # Features=38436 | Cells=13120 | Active assay=RNA | Assays=RNA
-# .cell              orig.ident    nCount_RNA nFeature_RNA percent.mt
-# <chr>              <fct>              <dbl>        <int>      <dbl>
-#   1 TACATTCGTCTACATG-1 SeuratProject      14759         5988      4.65 
-# 2 TAAGCACTCCGGCAGT-1 SeuratProject       9534         4011      0.388
-# 3 TGCAGTATCTCGACCT-1 SeuratProject       9052         3870      1.37 
-# 4 TACATTCCACCTAAAC-1 SeuratProject      11678         5677      7.29 
-# 5 AGACAAACAGTTCCAA-1 SeuratProject       2923         1729      0.958
-# 6 CACGAATGTAGTCCTA-1 SeuratProject       7865         3392      0.788
-# 7 TCTTCCTGTGGGCTCT-1 SeuratProject       8747         4348      0.126
-# 8 CTCGAGGCACTCTAGA-1 SeuratProject       8468         4308      0.437
-# 9 ACGTTCCGTTGGTGTT-1 SeuratProject       8451         4758     15.5  
-# 10 TTCTCTCAGGTTGAGC-1 SeuratProject       7382         4152      0.745
-# # … with 13,110 more rows
-# # ℹ Use `print(n = ...)` to see more rows
-
-
-
-
-
-
-
-
-
 ## counts data 
 ## it should be a sparse matrix
-
 count = seurat_h5$nCount_RNA
 head(count)
-
+## barcode
 barcode = seurat_h5$orig.ident
 head(barcode)
-
-
+## feature
 feature = seurat_h5$nFeature_RNA
 head(feature)
 
@@ -222,6 +129,24 @@ violin_plot =
 
 
 violin_plot
+
+
+
+ggsave(
+  file.path(plot_dir, violin_plot),
+  plot = last_plot(),
+  device = NULL,
+  path = NULL,
+  scale = 1,
+  width = NA,
+  height = NA,
+  units = c("in", "cm", "mm", "px"),
+  dpi = 300,
+  limitsize = TRUE,
+  bg = NULL
+)
+
+
 
 
 # ggsave(
@@ -946,7 +871,7 @@ umap_0.6 + umap_0.7
 # Finding differentially expressed features (cluster biomarkers)
 
 # find all markers of cluster 1
-## potential adipocytes
+## potential    
 cluster1.markers =  
   FindMarkers(seurat_h5_umap, 
               ident.1 = 1, 
@@ -963,7 +888,7 @@ DimPlot(seurat_h5_umap,
 
 
 # find all markers of cluster 2
-## potential preadipocytes
+## potential pre   
 cluster2.markers =  
   FindMarkers(seurat_h5_umap, 
               ident.1 = 2, 
@@ -1295,29 +1220,29 @@ seurat_h5_cluster_id$singleR_lable = results$labels
 ### adding the manual lables here 
 ## annotated according to 
 ## Supplemental Table 8 
-## Single nucleus RNAseq of human subcutaneous white adipose tissue RNAseq 
+## Single nucleus RNAseq of human    white    tissue RNAseq 
 ###############
 ## cells of interest
-## Preadipocytes (e.g., gene PNISR  maps to cluster 2 and 4 in seurat_h5.markers)
-## Adipocytes (e.g., gene RTN3  maps to cluster 1 in seurat_h5.markers)
+## Pre    (e.g., gene PNISR  maps to cluster 2 and 4 in seurat_h5.markers)
+##     (e.g., gene RTN3  maps to cluster 1 in seurat_h5.markers)
 meta_new = 
   seurat_h5_cluster_id@meta.data %>% 
   as_tibble() %>% 
   mutate(labs_t8 = 
-           case_when(seurat_clusters == 1 ~ "Adipocytes", 
-                     seurat_clusters == 2 ~ "Preadipocytes", 
-                     # seurat_clusters == 4 ~ "Preadipocytes", # Endothelial_cells     
+           case_when(seurat_clusters == 1 ~ "   ", 
+                     seurat_clusters == 2 ~ "Pre   ", 
+                     # seurat_clusters == 4 ~ "Pre   ", # Endothelial_cells     
                      TRUE ~ as.character(seurat_clusters)
            )) 
 # %>% 
-# filter(labs_t8 == "Preadipocytes")
+# filter(labs_t8 == "Pre   ")
 
 
 
 meta_new %>% 
   as_tibble() %>% 
-  # filter(labs_t8 == "Adipocytes") %>% 
-  filter(labs_t8 == "Preadipocytes") %>% 
+  # filter(labs_t8 == "   ") %>% 
+  filter(labs_t8 == "Pre   ") %>% 
   dplyr::count(singleR_lable, sort = TRUE)
 
 labs_new = 
@@ -1398,9 +1323,9 @@ DimPlot(seurat_h5_umap,
 
 
 
-Preadipocytes = 
+Pre    = 
   seurat_h5_cluster_id@meta.data %>% 
-  filter(labs_t8 == "Preadipocytes") %>% 
+  filter(labs_t8 == "Pre   ") %>% 
   CreateSeuratObject()
 DimPlot(seurat_h5_umap, group.by = "labs_t8", 
         reduction = "umap", label = TRUE)
@@ -1432,11 +1357,11 @@ seurat_h5.markers
 
 ## annotated according to 
 ## Supplemental Table 8 
-## Single nucleus RNAseq of human subcutaneous white adipose tissue RNAseq 
+## Single nucleus RNAseq of human    white    tissue RNAseq 
 ###############
 ## cells of interest
-## Preadipocytes (e.g., gene PNISR  maps to cluster 2 and 4 in seurat_h5.markers)
-## Adipocytes (e.g., gene RTN3  maps to cluster 1 in seurat_h5.markers)
+## Pre    (e.g., gene PNISR  maps to cluster 2 and 4 in seurat_h5.markers)
+##     (e.g., gene RTN3  maps to cluster 1 in seurat_h5.markers)
 
 seurat_h5.markers_new 
 
